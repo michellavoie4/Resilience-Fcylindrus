@@ -1,3 +1,5 @@
+This package is composed of MATLAB and Python codes, which analyze the robustness of F. cylindrus molecular network. This is the first preliminary version (v0.1.0).
+
 This code requires the following softwares and toolboxes:
  - MATLAB
  - The open-source MATLAB toolbox called ‘ Constraint-Based Reconstruction and Analysis (COBRA)Toolbox’
