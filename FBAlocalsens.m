@@ -445,12 +445,15 @@ model1 = changeRxnBounds(model1,'EX_pi_e', P_low, 'u'); % Bd: -1000 / 0
 
 FBAsolution = optimizeCbModel(model1, 'max','one');
 u(i,j) = FBAsolution.f * 24;
+
 %u(i,j) = FBAsolution.x(2143) * 24;
 % Rxn IDs of biomass function : 2100 to 2105 , 2113 + 2114, 2119, 2140, 2141, 2143, 2144-2146
 %model1.rxns( find(contains(model1.rxns(), 'biomass') ) )
 %findRxnIDs(model1, ans) % 2100, 2101, 2102, 2110, 2111, 2116, 2143
 %p(i,j) = 2
 %pigmbio(i, j) = FBAsolution.x(2101)
+
+%u(i,j) = FBAsolution.x(2143);
 
     end
 end

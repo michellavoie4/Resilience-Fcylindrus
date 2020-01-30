@@ -56,7 +56,70 @@ verifyModel(model, 'simpleCheck', true)
 % Curation of 'model'
 mets_length = length(model.mets)
 rxns_length = length(model.rxns)
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Write a table listing all protein IDs included in the original P.
+% tricornutum model
+TableTotPt = [model.rxns(), model.rxnNames(), model.grRules()];
+TableTotPt = cell2table(TableTotPt, 'variableNames', {'Reaction_Abbr', 'Reaction_Name', 'Protein_ID'});
+% write to file
+writetable(TableTotPt,'TableTotPt.xls')
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Making a table of P. tricornutum proteins for which we did not find any
+% homologous proteins. This does not take into account the missing GPR in
+% P. tricornutum
+% This includes protein with partial sequences as well as non-homologous
+% proteins.
+NumSeq = [1768, 57, 63, 95, 99, 106, 119, 139, 146, 172, 186, 187, 191, 220, 222, 242, 1771, 323,...
+    361, 390, 429, 452, 469, 915, 916, 917, 429, 452, 469, 2000, 918:924, 2081, 2088,...
+    618, 619, 565, 566, 569, 570, 605, 606, 611, 612, 693, 740, 741, 949, 950, 983, 1312, 1353, 1391, 1392,...
+    [1401:1405], 1428, 1429, 1446, 1450, 1958, 1460, 1485, 1486, 1492, 1493, 1586, 1495, 1529, 1564,...
+    1565, 1576, 1605, 1616, 1619, 1620, 1634, 1635, 1628, 1632, 1633, 1627, 1629, 1886, 1640, 1648, 1655,...
+    1649, 1679, 1669, 1675, 1676, 1677, 1691, 1692, 1697, 1698, 1699, 1702, 1706, 1707,...
+    1744, 1749, 1750, 1846, 1761, 1766, 1894, 1896, 2039, 2041, 2071, 2072]
+NumSeq = unique(NumSeq)
+MissingRxnAbbr = model.rxns(NumSeq)
+MissingRxn = model.rxnNames(NumSeq)
+ProteinIDs = model.grRules(NumSeq)
+TableMiss = [MissingRxnAbbr, MissingRxn, ProteinIDs]
+TableMiss = cell2table(TableMiss, 'variableNames', {'Reaction_Abbr', 'Reaction_Name', 'Protein_ID'})
+% write to file
+writetable(TableMiss,'TableMiss.xls')
+fprintf('Number of P. tricornutum proteins with no homologous sequences in F. cylindrus : %4.0f\n', length(NumSeq))
+TotaluniqueID = length(unique(model.grRules))
+R = length(rmmissing(model.grRules));
+fprintf('The total number of GPR is : %4.0f\n',R)
+%TotalProt = length(model.rxns)
+fprintf('Out of 1868 reactions with protein IDs, the proportion (in percent) of proteins with non-homologous proteins is : %4.1f\n', 100*length(NumSeq)/R)
+
+
+% Making a table of protein IDs for which subcellular locations predictions
+% were wrong
+SubSeq = [78, 75, 17, 1910, 135, 136, 185, 190, 1708, 1721, 263, 265, 1730, 1727, 272, 337,...
+    [339:347], 1703, 362, 1593, 438, 419, 421, 427, 431, 447, 1755, 448, 1670, [1379:1382],...
+    1476, 1478, 1510, 1523, 1557, 1601, 1603, 1665, 1666, 1667, 1673, 1674, 1694, 1695, 1705,...
+    1759, 1760, 1763, 1749, 1801, 1802, 1899]
+WrongSubRAbbr = model.rxns(SubSeq)
+WrongSubRxn = model.rxnNames(SubSeq)
+ProteinIDs = model.grRules(SubSeq)
+TableSub = [WrongSubRAbbr, WrongSubRxn, ProteinIDs]
+TableSub = cell2table(TableSub, 'variableNames', {'Reaction_Abbr', 'Reaction_Name', 'Protein_ID'})
+% write to file
+writetable(TableSub,'TableSub.xls')
+R = length(rmmissing(model.grRules));
+fprintf('The total number of GPR is : %4.0f\n',R)
+fprintf('Number of proteins with missclassified subcellular locations : %4.0f\n', length(SubSeq))
+fprintf('Out of 767 gene or protein IDs, the proportion (in percent) of proteins with missclassified subcellular locations is : %4.1f\n ', 100*length(SubSeq)/R)
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Updating the grRules field with the genes of F. cylindrus
 % model.grRules = {}
 % Fixing the bugs related to reactions deletion : When deleting reactions,
@@ -70,6 +133,7 @@ cellArrayChar = cellfun(@num2str, cellarray, 'UniformOutput', false)
 model.grRules = cellArrayChar 
 
 iscellstr(model.grRules) % True if it is a cell array of character array
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Adding all gene numbers or protein IDs of Fragilariopsis cylindrus CCMP1102, which is
@@ -467,7 +531,7 @@ model.grRules{396} = '(259433)'
 model.grRules{399} = '(178586)' % Manually annotated, EDD_m
 model.grRules{400} = '(267632)' % Manually annotated, EDA_m
 % Check rxn 403: the numbers 500...
-model.grRules([403, 1452], 1) = {'(184116 and (147482 or 196615 or 195439)'}
+model.grRules([403, 1452], 1) = {'(184116 and (147482 or 196615 or 195439))'}
 model.grRules{404} = '(232978)' % Manually annotated, ACK_c
 model.grRules{406} = '(168262)' % Manually annotated, IDH_m
 model.grRules{407} = '(177813)'
@@ -1353,7 +1417,8 @@ model1 = changeRxnBounds(model1, 'MEHLER_h', 0, 'b')
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Updating the biomass objective function
 
-% Pigments measured in F. cylindrus under continuous light (30 umol m-2 s-1) (Guérin et al, in prep)
+% Pigments measured in F. cylindrus under continuous light (30 umol m-2
+% s-1) (This study)
 Ccell = 7.5E-12   % g C / cell
 DWcell = Ccell * 2. % 1.5E-11 % Ccell * 2.  % Assume a g DW / g C = 2, Ccell * 2. = 1.5e-11
 chla_P = 0.14          % pg Chla / cell
@@ -1606,7 +1671,7 @@ surfNet(model1, 'EX_pi_e', 0, FBAsolution.x)
 %}
 %{
 C_N = 5.72 
-% 7.5 or 5.5; Guérin et al measured a C:N ratio of 5.5, 
+% 7.5 or 5.5; We measured a C:N ratio of 5.5, 
 % Garcia et al measured a C:N ratio of 5.72
 N_P = 10.1  % Garcia et al (2018): 10.1 ; N. Schiffrin: N:P= 13
 fold_change = 1.1
@@ -1789,7 +1854,7 @@ model1 = addReaction(model1, 'DM_biomass_c_acc_c', 'metaboliteList', {'biomass_c
     'reversible', false);
 model1 = changeObjective(model1, 'DM_biomass_c_acc_c');
 
-Ps = 1/12 * (1000 * chla_P * 1E-12 / DWcell)   % Ps measured by S. Guérin (1 mg C mg chla-1 h-1 / 12 g/mol * mg chla / gDW ) = (mmol C g DW-1 h-1)
+Ps = 1/12 * (1000 * chla_P * 1E-12 / DWcell)   % Ps measured in F. cylindrus (This study) (1 mg C mg chla-1 h-1 / 12 g/mol * mg chla / gDW ) = (mmol C g DW-1 h-1)
 % Ps at 30 umol m-2 s-1 at 0 C
 % Here I should calculate error propagation on Ps (due to chla, C quotas
 % and other parameters...)
@@ -1802,10 +1867,10 @@ model1 = changeRxnBounds(model1, 'EX_co2_e', 1000, 'u');
 
 % Constraints C:N and N:P ratios
 C_N = 5.72 
-% 7.5 or 5.5; Guérin et al measured a C:N ratio of 5.5, 
+% 7.5 or 5.5; We measured a C:N ratio of 5.5 in F. cylindrus (This study), 
 % Garcia et al (2018) measured a C:N ratio of 5.72
 N_P = 10.1  % Garcia et al (2018): 10.1 ; N. Schiffrin: N:P= 13
-fold_change = 1.0
+fold_change = 1 % If this is set to a high value (e.g., 100), we find a N:P = 16.66 and a C:N = 7.6027
 N_low =  - Ps / (C_N * fold_change) ; % in mmol / gDW / h % 6.6
 N_high = - Ps / (C_N / fold_change);
 P_low = - Ps / (C_N * N_P * fold_change);  % in mmol / gDW / h % 106
@@ -1871,6 +1936,233 @@ fprintf('Number of active reactions : %4.2f \n', length(IndActive) );
 fprintf('Proportion of active reactions : %4.2f \n', 100 * length(IndActive) / length(FBAsolution.x));
 fprintf('Number of inactive reactions : %4.2f \n', length(IndInac) );
 fprintf('Proportion of inactive reactions : %4.2f \n', 100 * length(IndInac) / length(FBAsolution.x));
+
+% Write a table listing all protein IDS included in our F. cylindrus model
+TableTotFc = [model1.rxns(), model1.rxnNames(), model1.grRules()];
+TableTotFc = cell2table(TableTotFc, 'variableNames', {'Reaction_Abbr', 'Reaction_Name', 'Protein_ID'});
+% write to file
+writetable(TableTotFc,'TableTotFc.xls')
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Add allelic variant Protein IDs in the model
+
+% First load the 'sdata2017149-s2.xlsx' file
+% This table represents the allelic variants found in F. cylindrus with the
+% ARACHNE assembly
+% 
+T_Variants = readtable('sdata2017149-s2.xlsx');
+head(T_Variants)
+T_Variants = table2cell(T_Variants)
+length(T_Variants)
+% Removing titles in the two first columns
+T_Variants(1:2,1:2) = {[]}
+T_Variants(3,1) % Gives the first column, 3th row , same than T_Variants(3)
+T_Variants(3,2) % Gives the second column, 3th row
+T_Variants = T_Variants(3:end, 1:2)
+
+% There are a problem with the second column of the cell array (bracket
+% signs)
+% Refer to it using 'T_Variants{i,2}' and not 'T_Variants(i,2)'
+% We must convert it to 'char', see below.
+
+% First look for matches using the first row of the table
+i = 0
+a = 1
+MatchAllele = {}
+AllelicPair = {}
+for i = 1: length(T_Variants)
+expression_1 = T_Variants{i,1};
+matchNumber = regexp(model1.grRules,expression_1,'match');
+flatCellArray = [matchNumber{:}];
+flatCellArray = flatCellArray';
+if isempty(flatCellArray) == 0
+    %disp(i)
+    %disp("There is a match here!!!")
+    MatchAllele{a} = expression_1
+    AllelicPair{a} = T_Variants{i,2}
+    a = a + 1
+end
+end
+MatchAllele1 = MatchAllele;
+fprintf("Number of matches : %4.0f\n", length(MatchAllele1))
+MatchAllele1
+AllelicPair1 = AllelicPair
+
+
+% Second look for matches using the second row of the table
+i = 0
+a = 1
+MatchAllele = {}
+for i = 1: length(T_Variants)
+expression_1 = char(T_Variants{i,2});
+matchNumber = regexp(model1.grRules,expression_1,'match');
+flatCellArray = [matchNumber{:}];
+flatCellArray = flatCellArray';
+if isempty(flatCellArray) == 0
+    %disp(i)
+    %disp("There is a match here!!!")
+    MatchAllele{a} = expression_1
+    a = a + 1
+end
+end
+MatchAllele2 = MatchAllele;
+fprintf("Number of matches : %4.0f\n", length(MatchAllele2))
+MatchAllele2
+
+
+% Checking the second .xlsx file
+T_Variants = readtable('sdata2017149-s3.xlsx')
+head(T_Variants)
+T_Variants = table2cell(T_Variants)
+length(T_Variants)
+% Removing titles in the two first columns
+T_Variants(1:2,1:2) = {[]}
+T_Variants(3,1) % Gives the first column, 3th row , same than T_Variants(3)
+T_Variants(3,2) % Gives the second column, 3th row
+T_Variants = T_Variants(3:end, 1:2)
+
+
+% There are a problem with the second column of the cell array (bracket
+% signs)
+% Refer to it using 'T_Variants{i,2}' and not 'T_Variants(i,2)'
+% We must convert it to 'char', see below.
+
+% First look for matches using the first row of the table
+i = 0
+a = 1
+MatchAllele = {}
+AllelicPair = {}
+for i = 1: length(T_Variants)
+expression_1 = T_Variants{i,1};
+matchNumber = regexp(model1.grRules,expression_1,'match');
+flatCellArray = [matchNumber{:}];
+flatCellArray = flatCellArray';
+if isempty(flatCellArray) == 0
+    %disp(i)
+    %disp("There is a match here!!!")
+    MatchAllele{a} = expression_1
+    AllelicPair{a} = T_Variants{i,2}
+    a = a + 1
+end
+end
+MatchAllele3 = MatchAllele;
+fprintf("Number of matches : %4.0f\n", length(MatchAllele3))
+MatchAllele3
+AllelicPair3 = AllelicPair
+
+% Second look for matches using the second row of the table
+i = 0
+a = 1
+MatchAllele = {}
+for i = 1: length(T_Variants)
+expression_1 = char(T_Variants{i,2});
+matchNumber = regexp(model1.grRules,expression_1,'match');
+flatCellArray = [matchNumber{:}];
+flatCellArray = flatCellArray';
+if isempty(flatCellArray) == 0
+    %disp(i)
+    %disp("There is a match here!!!")
+    MatchAllele{a} = expression_1
+    a = a + 1
+end
+end
+MatchAllele4 = MatchAllele;
+fprintf("Number of matches : %4.0f\n", length(MatchAllele4))
+MatchAllele4
+%%%%%%%%%%%%%
+
+
+%%%%%%%%%%%%%
+% Update the nodel with allelic variants (AllelicPair1, AllelicPair3)
+% Note there are a few allelic variant include because only a few of
+% matches occured between the genes included in our model and the genes
+% included in the table of allelic variants. This means that much variation
+% is not taken into account.
+% Indeed, in the table s2 and s3, there are 12146 proteinID (s2)
+% and 3792 proteinID (s3), although some overlap exist between tables...
+
+% Add 'AllelicPair1' in model1.grRules() next to 'MatchAllele1'
+model2 = model1
+
+% remove duplicates in AllelicPair1 before updating the model
+% I must remove 206912 and 259733 from AllelicPair1 (two last values)
+% I must remove two last values of MatchAllele1 too. These are duplicates
+MatchAllele1 = MatchAllele1(1:4)
+AllelicPair1 = AllelicPair1(1:4)
+
+fprintf("The number of allelic variants added in model2 is : %4.2f\n", length(AllelicPair1) + length(AllelicPair3))
+
+i = 0
+Tnew = []
+T = []
+for i = 1:length(MatchAllele1)
+expression = MatchAllele1(i);
+matchNumber = regexp(model1.grRules,expression,'match');
+Ind = find(~cellfun(@isempty,matchNumber)); % Find the position in grRules
+matchNumber{Ind};
+m1 = model2.grRules(Ind);
+allel = AllelicPair1{i}; % Refer to the data with {}.
+allel = num2str(allel);
+model2.grRules(Ind) = strcat(m1, ' or (', allel, ')'); % Update the grRule field
+disp(model2.grRules(Ind))
+% Create a table of added allelic variants ID and reaction Names
+%Tnew = [model2.rxns(Ind), model2.rxnNames(Ind), AllelicPair1(i)]
+%T = [T, Tnew]
+%T = cell2table(T, 'variableNames', {'Reaction_Abbr', 'Reaction_Name', 'Protein_ID'});
+
+Tnew = table(model2.rxns(Ind), model2.rxnNames(Ind), AllelicPair1(i));
+Tnew.Properties.VariableNames = {'Reaction_Abbr', 'Reaction_Name', 'Protein_ID'};
+T = [T ; Tnew];
+end
+
+% Add 'AllelicPair3' in model1.grRules() next to 'MatchAllele3'
+i = 0
+T = T
+Tnew = []
+for i = 1:length(MatchAllele3)
+expression = MatchAllele3(i);
+matchNumber = regexp(model1.grRules,expression,'match');
+Ind = find(~cellfun(@isempty,matchNumber));
+matchNumber{Ind};
+m1 = model2.grRules(Ind);
+allel = AllelicPair3{i}; % Refer to the data with {}.
+allel = num2str(allel);
+model2.grRules(Ind) = strcat(m1, ' or (', allel, ')'); % 
+disp(model2.grRules(Ind))
+
+% Create a table
+% Must repeat the AllelicPair3 because it is involved in different
+% reactions.
+AllelicPairRep = repmat(AllelicPair3{i}, length(model2.rxns(Ind)),1)
+Tnew = table(model2.rxns(Ind), model2.rxnNames(Ind), num2cell(AllelicPairRep));
+Tnew.Properties.VariableNames = {'Reaction_Abbr', 'Reaction_Name', 'Protein_ID'};
+T = [T ; Tnew];
+end
+
+% write an excel file summarizing the allelic variants included to model2
+writetable(T,'AllelicVariantsAll.xls')
+
+%%%%%%%%%%%%%
+% Update the model2.genes and the model2.rules fields
+% Extract all gene numbers in model2
+expression = '\d*\d*'
+matchNumber = regexp(model2.grRules,expression,'match')
+% Unest the cell array
+flatCellArray = [matchNumber{:}]
+% Transpose the row cell array to a column cell array
+flatCellArray = flatCellArray'
+% Fill the .genes field with the list of genes
+model2.genes = flatCellArray
+% Removing the same genes occuring more than one time
+% By default, the unique function uses the argument 'sorted' and replace (if needed) in
+% ascending order the number in the vector. 
+model2.genes = unique(model2.genes)
+% generate the .rules field with the .grRules field and the .gene field
+model2 = generateRules(model2)
+model2 = buildRxnGeneMat(model2) % A matrix with n reactions by m genes
+%%%%%%%%%%%%%%
+
+
 
 %{
 % Ratio C:N : What ratios should we choose?

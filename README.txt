@@ -1,5 +1,3 @@
-This package is composed of MATLAB and Python codes, which analyze the robustness of F. cylindrus molecular network. This is the first stable version (v1.0.0).
-
 This code requires the following softwares and toolboxes:
  - MATLAB
  - The open-source MATLAB toolbox called ‘ Constraint-Based Reconstruction and Analysis (COBRA)Toolbox’
@@ -22,9 +20,11 @@ All instructions can be found at : https://opencobra.github.io/cobratoolbox/stab
 
 6. Figure 2 is produced by running the script 'globalSA_Morris.m'
 
-7. Figure 3 is obtained after running the script 'ReactionDeletionSensitivity.m'
+7. Figure 3 and 5 are obtained after running the script 'ReactionDeletionSensitivity.m'
 
-8. Network metrics in Python (i.e., degree distribution and centrality indices) are obtained by running the script 'bipartite.m' in MATLAB and running the script 'main_analyse_reseau.py' in Python, which import all functions in the file 'analyse_reseau_2.py'.
+8. Network metrics (Figure 4) in Python (i.e., degree distribution and centrality indices) are obtained by running the script 'bipartite.m' in MATLAB and running the script 'main_network_analysis.py' in Python, which import all functions in the file 'network_metrics.py'.
+
+
 
  
 

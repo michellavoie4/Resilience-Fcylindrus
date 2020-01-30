@@ -101,6 +101,9 @@ ur = abs( u(:,1) - uc ) ./ uc % Relative change for the 1.4-fold decrease with r
 urellow = ur * 100. % Relative change in percent
 %}
 
+% ATTENTION
+%uc = FBAsolution.x(2143)
+
 ur = ( u(:,2) - uc ) ./ uc % Relative change for the 1.4-fold increase with respect to control growth rate
 urelhigh = ur * 100. 
 minHigh = min(urelhigh)
@@ -123,7 +126,11 @@ writetable(Table_u,'LocalSens_Table.xls')
 
 % plot the growth rate sensitivity (in %) for a 1.4-fold increase in each paramater
 figure(1)
-bar1 = bar(urelhigh);
+yt = urelhigh;
+yt(yt>0) = log10(1+yt(yt>0));
+yt(yt<0) = -log10(1-yt(yt<0));
+
+bar1 = bar(yt, 'r');
 %ylim([-5 5]);
 x = []; % create a vectyor of x thick values
 i = 0;
@@ -134,7 +141,9 @@ xticks(x);
 xticklabels(param_names);
 xtickangle(90);
 ax = gca;
-ax.FontSize = 6; 
+set(ax, 'YTick', [-2 -1 0 1 2], ...
+    'YTickLabel', {'-100', '-10', '0', '10', '100'});
+ax.FontSize = 8; 
 xlabel('Parameters', 'FontSize', 12);
 ylabel('Relative change in growth rate (%)', 'FontSize', 12); % Relative change in growth rate in response to a rise in each parameter by 1.4-fold
 % set(gca,'FontSize',6)
@@ -144,14 +153,19 @@ hold on
 % plot the effect of a 1.4-fold decrease in each parameter on growth rate
 % (in %)
 %figure(2)
-bar2 = bar(urellow);
+yt = urellow;
+yt(yt>0) = log10(1+yt(yt>0));
+yt(yt<0) = -log10(1-yt(yt<0));
+bar2 = bar(yt, 'b');
 % ylim([-5 50]);
 %set(gca,'FontSize',6)
 %saveas(gcf,'LocalSens_decrease.pdf');
 hold off
-legend({'Increase','Decrease'}, 'FontSize', 12)
+legend({'Increase','Decrease'}, 'FontSize', 11, 'Location','northwest')
 ax = gca;
-ax.FontSize = 6; 
+set(ax, 'YTick', [-2 -1 0 1 2], ...
+    'YTickLabel', {'-100', '-10', '0', '10', '100'});
+ax.FontSize = 8; 
 xlabel('Parameters', 'FontSize', 12);
 ylabel('Relative change in growth rate (%)', 'FontSize', 12); % Relative change in growth rate in response to a rise in each parameter by 1.4-fold
 yrule = ax.YAxis;
