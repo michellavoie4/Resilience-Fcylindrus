@@ -1,3 +1,5 @@
+This is the second stable version (v2.0.0)
+
 This code requires the following softwares and toolboxes:
  - MATLAB
  - The open-source MATLAB toolbox called ‘ Constraint-Based Reconstruction and Analysis (COBRA)Toolbox’
